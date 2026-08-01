@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0a0e27">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="روتین">
+  <meta name="description" content="مدیریت روتین روزانه‌ات با سادگی و زیبایی">
+  <link rel="manifest" href="data:application/json,{
+    \"name\": \"روتین روزانه\",
+    \"short_name\": \"روتین\",
+    \"icons\": [{\"src\": \"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%2300d4ff;stop-opacity:1'/><stop offset='100%' style='stop-color:%23ff006e;stop-opacity:1'/></linearGradient></defs><rect width='192' height='192' fill='%230a0e27'/><circle cx='96' cy='96' r='80' fill='url(%23g)'/><text x='96' y='110' font-size='80' font-weight='900' fill='%230a0e27' text-anchor='middle' font-family='Arial'>✓</text></svg>\", \"sizes\": \"192x192\", \"type\": \"image/svg+xml\"}],
+    \"start_url\": \"./\",
+    \"scope\": \"./\",
+    \"display\": \"fullscreen\",
+    \"orientation\": \"portrait\",
+    \"background_color\": \"#0a0e27\",
+    \"theme_color\": \"#0a0e27\"
+  }">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%2300d4ff'/><stop offset='100%' style='stop-color:%23ff006e'/></linearGradient></defs><rect width='180' height='180' rx='40' fill='%230a0e27'/><circle cx='90' cy='90' r='70' fill='url(%23g)'/><text x='90' y='105' font-size='70' font-weight='900' fill='%230a0e27' text-anchor='middle' font-family='Arial'>✓</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g'><stop offset='0%' style='stop-color:%2300d4ff'/><stop offset='100%' style='stop-color:%23ff006e'/></linearGradient></defs><rect width='100' height='100' fill='%230a0e27'/><circle cx='50' cy='50' r='40' fill='url(%23g)'/><text x='50' y='60' font-size='50' font-weight='900' fill='%230a0e27' text-anchor='middle' font-family='Arial'>✓</text></svg>">
+  
+  <title>روتین روزانه</title>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap');
+    @supports (padding: max(0px)) {
+      body { padding-left: max(0px, env(safe-area-inset-left)); padding-right: max(0px, env(safe-area-inset-right)); padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: max(80px, env(safe-area-inset-bottom)); }
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1628 100%);
+      color: #fff;
+      font-family: 'Vazirmatn', Tahoma, sans-serif;
+      letter-spacing: 0.3px;
+    }
+    
+    #root {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100%;
+    }
+    
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: linear-gradient(180deg, #0a0e27 0%, #1a1f3a 50%, #0f1628 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    
+    .content-area::-webkit-scrollbar { width: 4px; }
+    .content-area::-webkit-scrollbar-track { background: transparent; }
+    .content-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    
+    /* Header */
+    .header {
+      padding: 24px 20px 16px;
+      background: linear-gradient(180deg, rgba(10,14,39,0.8) 0%, rgba(26,31,58,0.4) 100%);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .header-greeting {
+      font-size: 28px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #00d4ff, #ff006e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    
+    .header-subtitle {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      font-weight: 500;
+    }
+    
+    .progress-ring {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .progress-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: conic-gradient(#00d4ff var(--percent), rgba(255,255,255,0.1) 0deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    
+    .progress-info {
+      flex: 1;
+    }
+    
+    .progress-percent {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #00d4ff, #00b8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .progress-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 2px;
+    }
+    
+    /* Main Content */
+    .main-content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    /* Week Navigation */
+    .week-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .week-nav button {
+      background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(255,0,110,0.1));
+      border: 1px solid rgba(255,255,255,0.1);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      color: #00d4ff;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .week-nav button:active {
+      transform: scale(0.9);
+    }
+    
+    .week-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+    }
+    
+    /* Day Pills */
+    .days-container {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .day-pill {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: rgba(255,255,255,0.04);
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .day-pill::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: conic-gradient(#00d4ff var(--percent), transparent 0deg);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .day-pill.has-tasks::before {
+      opacity: 0.15;
+    }
+    
+    .day-pill.active {
+      border-color: #00d4ff;
+      box-shadow: 0 0 20px rgba(0,212,255,0.4);
+      background: rgba(0,212,255,0.1);
+    }
+    
+    .day-count {
+      font-size: 16px;
+      font-weight: 800;
+      color: #00d4ff;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .day-label {
+      font-size: 9px;
+      color: rgba(255,255,255,0.6);
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Cards */
+    .card {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+      border-color: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+    }
+    
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: rgba(255,255,255,0.9);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .card-title-emoji {
+      font-size: 16px;
+    }
+    
+    /* Input Form */
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .input-group input {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #fff;
+      font-family: 'Vazirmatn', Tahoma, sans-serif;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .input-group input:focus {
+      outline: none;
+      border-color: #00d4ff;
+      background: rgba(0,212,255,0.08);
+      box-shadow: 0 0 12px rgba(0,212,255,0.2);
+    }
+    
+    .input-group input::placeholder {
+      color: rgba(255,255,255,0.4);
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: #0a0e27;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .btn:active {
+      transform: scale(0.95);
+    }
+    
+    /* Task List */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      transition: all 0.3s;
+      cursor: pointer;
+      animation: slideIn 0.3s ease forwards;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .task-item:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.12);
+    }
+    
+    .task-checkbox {
+      width: 24px;
+      height: 24px;
+      border: 2px solid rgba(0,212,255,0.6);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .task-checkbox.checked {
+      background: linear-gradient(135deg, #00d4ff, #00ff88);
+      border-color: #00ff88;
+    }
+    
+    .task-checkbox.checked::after {
+      content: '✓';
+      color: #0a0e27;
+      font-weight: 900;
+      font-size: 14px;
+    }
+    
+    .task-text {
+      flex: 1;
+      font-size: 14px;
+      color: rgba(255,255,255,0.9);
+      transition: all 0.3s;
+    }
+    
+    .task-item.done .task-text {
+      color: rgba(255,255,255,0.5);
+      text-decoration: line-through;
+    }
+    
+    .task-delete {
+      background: none;
+      border: none;
+      color: rgba(255,0,110,0.7);
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s;
+      padding: 4px;
+    }
+    
+    .task-delete:active {
+      transform: scale(1.2);
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: rgba(255,255,255,0.4);
+    }
+    
+    .empty-emoji {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+    
+    .empty-text {
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: max(60px, env(safe-area-inset-bottom) + 60px);
+      background: linear-gradient(180deg, rgba(10,14,39,0.6) 0%, rgba(10,14,39,0.95) 100%);
+      backdrop-filter: blur(15px);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      z-index: 20;
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 12px;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex: 1;
+    }
+    
+    .nav-item.active {
+      color: #00d4ff;
+    }
+    
+    .nav-icon {
+      font-size: 20px;
+    }
+    
+    .nav-label {
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    /* Stats Tab */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    
+    .stat-box {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 28px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #00d4ff, #ff006e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 4px;
+    }
+    
+    .stat-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 600;
+    }
+    
+    /* Finance */
+    .finance-balance {
+      background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(255,0,110,0.1));
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    
+    .finance-label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 8px;
+    }
+    
+    .finance-amount {
+      font-size: 32px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #00ff88, #00d4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    
+    .finance-detail {
+      display: flex;
+      justify-content: space-around;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+    }
+    
+    .finance-item {
+      text-align: center;
+    }
+    
+    .finance-item-label {
+      font-size: 10px;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="module">
+    // App State Management
+    const STORAGE_KEY = 'routine-app-v2';
+    const PERSIAN_DAYS = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
+    const PERSIAN_MONTHS = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+
+    function toPersianDigits(n) {
+      const m = { '0': '۰', '1': '۱', '2': '۲', '3': '۳', '4': '۴', '5': '۵', '6': '۶', '7': '۷', '8': '۸', '9': '۹' };
+      return String(n).replace(/[0-9]/g, d => m[d]);
+    }
+
+    function divInt(a, b) { return Math.floor(a / b); }
+
+    function gregorianToJalali(gy, gm, gd) {
+      const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+      const gy2 = (gm > 2) ? (gy + 1) : gy;
+      let days = 355666 + (365 * gy) + divInt(gy2 + 3, 4) - divInt(gy2 + 99, 100) + divInt(gy2 + 399, 400) + gd + g_d_m[gm - 1];
+      let jy = -1595 + (33 * divInt(days, 12053));
+      days %= 12053;
+      jy += 4 * divInt(days, 1461);
+      days %= 1461;
+      if (days > 365) {
+        jy += divInt(days - 1, 365);
+        days = (days - 1) % 365;
+      }
+      let jm, jd;
+      if (days < 186) {
+        jm = 1 + divInt(days, 31);
+        jd = 1 + (days % 31);
+      } else {
+        jm = 7 + divInt(days - 186, 30);
+        jd = 1 + ((days - 186) % 30);
+      }
+      return [jy, jm, jd];
+    }
+
+    function formatJalali(date) {
+      const [jy, jm, jd] = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
+      return `${toPersianDigits(jd)} ${PERSIAN_MONTHS[jm - 1]}`;
+    }
+
+    function dateKey(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function getWeekStart(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = (day - 6 + 7) % 7;
+      d.setDate(d.getDate() - diff);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
+
+    function addDays(date, n) {
+      const d = new Date(date);
+      d.setDate(d.getDate() + n);
+      return d;
+    }
+
+    function getWeekDates(weekStart) {
+      return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+    }
+
+    function uid() {
+      return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    }
+
+    function ensureWeek(weeksObj, key) {
+      if (weeksObj[key]) return weeksObj[key];
+      const w = {};
+      PERSIAN_DAYS.forEach(d => { w[d] = []; });
+      return w;
+    }
+
+    function computeStats(weekObj) {
+      if (!weekObj) return { total: 0, done: 0, percent: 0 };
+      let total = 0, done = 0;
+      PERSIAN_DAYS.forEach(d => {
+        const arr = weekObj[d] || [];
+        total += arr.length;
+        done += arr.filter(t => t.done).length;
+      });
+      const percent = total ? Math.round((done / total) * 100) : 0;
+      return { total, done, percent };
+    }
+
+    function getGreeting() {
+      const h = new Date().getHours();
+      if (h < 5) return '🌙 شب بخیر';
+      if (h < 12) return '🌅 صبح بخیر';
+      if (h < 17) return '☀️ ظهر بخیر';
+      if (h < 20) return '🌆 عصر بخیر';
+      return '🌙 شب بخیر';
+    }
+
+    // App Component
+    function App() {
+      const [data, setData] = React.useState({ weeks: {}, finance: [] });
+      const [loaded, setLoaded] = React.useState(false);
+      const [weekStart, setWeekStart] = React.useState(() => getWeekStart(new Date()));
+      const [selectedDay, setSelectedDay] = React.useState(() => PERSIAN_DAYS[(new Date().getDay() + 1) % 7]);
+      const [tab, setTab] = React.useState('routine');
+      const [taskInput, setTaskInput] = React.useState('');
+      const [financeType, setFinanceType] = React.useState('expense');
+      const [financeAmount, setFinanceAmount] = React.useState('');
+      const [financeDesc, setFinanceDesc] = React.useState('');
+
+      React.useEffect(() => {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            setData({ weeks: parsed.weeks || {}, finance: parsed.finance || [] });
+          }
+        } catch (e) {}
+        setLoaded(true);
+      }, []);
+
+      React.useEffect(() => {
+        if (!loaded) return;
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {}
+      }, [data, loaded]);
+
+      if (!loaded) return null;
+
+      const weekKey = dateKey(weekStart);
+      const weekObj = data.weeks[weekKey] || {};
+      const weekDates = getWeekDates(weekStart);
+      const tasksForDay = weekObj[selectedDay] || [];
+      const stats = computeStats(weekObj);
+      const balance = data.finance.reduce((s, f) => s + (f.type === 'income' ? f.amount : -f.amount), 0);
+
+      const handleAddTask = () => {
+        if (!taskInput.trim()) return;
+        setData(prev => {
+          const wk = ensureWeek(prev.weeks, weekKey);
+          const newDay = [...(wk[selectedDay] || []), { id: uid(), text: taskInput.trim(), done: false }];
+          return { ...prev, weeks: { ...prev.weeks, [weekKey]: { ...wk, [selectedDay]: newDay } } };
+        });
+        setTaskInput('');
+      };
+
+      const handleToggleTask = (id) => {
+        setData(prev => {
+          const wk = ensureWeek(prev.weeks, weekKey);
+          const updated = (wk[selectedDay] || []).map(t => t.id === id ? { ...t, done: !t.done } : t);
+          return { ...prev, weeks: { ...prev.weeks, [weekKey]: { ...wk, [selectedDay]: updated } } };
+        });
+      };
+
+      const handleDeleteTask = (id) => {
+        setData(prev => {
+          const wk = ensureWeek(prev.weeks, weekKey);
+          const updated = (wk[selectedDay] || []).filter(t => t.id !== id);
+          return { ...prev, weeks: { ...prev.weeks, [weekKey]: { ...wk, [selectedDay]: updated } } };
+        });
+      };
+
+      const handleAddFinance = () => {
+        const amt = parseFloat(financeAmount);
+        if (!amt || amt <= 0) return;
+        setData(prev => ({
+          ...prev,
+          finance: [{ id: uid(), type: financeType, amount: amt, desc: financeDesc || (financeType === 'income' ? 'درآمد' : 'هزینه'), date: dateKey(new Date()) }, ...prev.finance]
+        }));
+        setFinanceAmount('');
+        setFinanceDesc('');
+      };
+
+      return (
+        <div className="app-container">
+          <div className="header">
+            <div className="header-greeting">{getGreeting()}</div>
+            <div className="header-subtitle">یک روز خوب و پرمحتوا برای تو</div>
+            <div className="progress-ring">
+              <div className="progress-circle" style={{ '--percent': `${stats.percent * 3.6}deg` }}>
+                {stats.total > 0 ? toPersianDigits(stats.done) : '—'}
+              </div>
+              <div className="progress-info">
+                <div className="progress-percent">{toPersianDigits(stats.percent)}%</div>
+                <div className="progress-label">{stats.total} کار این هفته</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="content-area">
+            <div className="main-content">
+              <div className="week-nav">
+                <button onClick={() => setWeekStart(addDays(weekStart, -7))}>←</button>
+                <span className="week-label">{formatJalali(weekStart)}</span>
+                <button onClick={() => setWeekStart(addDays(weekStart, 7))}>→</button>
+              </div>
+
+              <div className="days-container">
+                {weekDates.map((date, i) => {
+                  const day = PERSIAN_DAYS[i];
+                  const dayTasks = weekObj[day] || [];
+                  const dayDone = dayTasks.filter(t => t.done).length;
+                  const dayPercent = dayTasks.length ? (dayDone / dayTasks.length) * 360 : 0;
+                  const isToday = dateKey(date) === dateKey(new Date());
+                  const isActive = day === selectedDay;
+                  return (
+                    <button
+                      key={day}
+                      className={`day-pill ${dayTasks.length > 0 ? 'has-tasks' : ''} ${isActive ? 'active' : ''}`}
+                      onClick={() => setSelectedDay(day)}
+                      style={{ '--percent': `${dayPercent}deg` }}
+                    >
+                      <div className="day-count">{dayTasks.length > 0 ? toPersianDigits(dayDone) : '—'}</div>
+                      <div className="day-label">{day[0]}</div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {tab === 'routine' && (
+                <>
+                  <div className="card">
+                    <div className="card-title"><span className="card-title-emoji">📋</span> {selectedDay}</div>
+                    <div className="input-group">
+                      <input value={taskInput} onChange={e => setTaskInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && handleAddTask()} placeholder="کاری جدید بنویس..." />
+                      <button className="btn" onClick={handleAddTask}>➕</button>
+                    </div>
+                    {tasksForDay.length === 0 ? (
+                      <div className="empty-state"><div className="empty-emoji">✨</div><div className="empty-text">هنوز کاری اضافه نکردی</div></div>
+                    ) : (
+                      <div className="task-list">
+                        {tasksForDay.map(t => (
+                          <div key={t.id} className={`task-item ${t.done ? 'done' : ''}`}>
+                            <button className={`task-checkbox ${t.done ? 'checked' : ''}`} onClick={() => handleToggleTask(t.id)} />
+                            <span className="task-text">{t.text}</span>
+                            <button className="task-delete" onClick={() => handleDeleteTask(t.id)}>✕</button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {tab === 'stats' && (
+                <div className="card">
+                  <div className="card-title"><span className="card-title-emoji">📊</span> آمار هفتگی</div>
+                  <div className="stat-grid">
+                    <div className="stat-box">
+                      <div className="stat-number">{toPersianDigits(stats.done)}</div>
+                      <div className="stat-label">انجام شده</div>
+                    </div>
+                    <div className="stat-box">
+                      <div className="stat-number">{toPersianDigits(stats.total - stats.done)}</div>
+                      <div className="stat-label">باقی مانده</div>
+                    </div>
+                    <div className="stat-box">
+                      <div className="stat-number">{toPersianDigits(stats.percent)}%</div>
+                      <div className="stat-label">پیشرفت</div>
+                    </div>
+                    <div className="stat-box">
+                      <div className="stat-number">🔥</div>
+                      <div className="stat-label">بمب!</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {tab === 'finance' && (
+                <div className="card">
+                  <div className="card-title"><span className="card-title-emoji">💰</span> مالی</div>
+                  <div className="finance-balance">
+                    <div className="finance-label">مانده</div>
+                    <div className="finance-amount">{toPersianDigits(Math.round(balance).toLocaleString())} تومان</div>
+                    <div className="finance-detail">
+                      <div className="finance-item">📈 {toPersianDigits(data.finance.filter(f => f.type === 'income').reduce((s, f) => s + f.amount, 0).toLocaleString())}</div>
+                      <div className="finance-item">📉 {toPersianDigits(data.finance.filter(f => f.type === 'expense').reduce((s, f) => s + f.amount, 0).toLocaleString())}</div>
+                    </div>
+                  </div>
+                  <div className="input-group" style={{ marginBottom: '12px' }}>
+                    <select value={financeType} onChange={e => setFinanceType(e.target.value)} style={{ ...document.querySelector('input')?.style, flex: 0.3 }}>
+                      <option value="expense">🔴 هزینه</option>
+                      <option value="income">🟢 درآمد</option>
+                    </select>
+                    <input value={financeAmount} onChange={e => setFinanceAmount(e.target.value)} type="number" inputMode="numeric" placeholder="مبلغ" />
+                    <button className="btn" onClick={handleAddFinance} style={{ padding: '12px 12px' }}>➕</button>
+                  </div>
+                  <input value={financeDesc} onChange={e => setFinanceDesc(e.target.value)} placeholder="توضیح (اختیاری)" className="input-group" style={{ width: '100%' }} />
+                  {data.finance.length === 0 ? (
+                    <div className="empty-state" style={{ marginTop: '20px' }}><div className="empty-emoji">💳</div><div className="empty-text">تراکنشی ثبت نشده</div></div>
+                  ) : (
+                    <div className="task-list" style={{ marginTop: '12px' }}>
+                      {data.finance.slice(0, 10).map(f => (
+                        <div key={f.id} className="task-item">
+                          <span style={{ fontSize: '16px' }}>{f.type === 'income' ? '📈' : '📉'}</span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div className="task-text">{f.desc}</div>
+                            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>{toPersianDigits(f.amount.toLocaleString())} تومان</div>
+                          </div>
+                          <button className="task-delete" onClick={() => setData(prev => ({ ...prev, finance: prev.finance.filter(x => x.id !== f.id) }))}>✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="bottom-nav">
+            <button className={`nav-item ${tab === 'routine' ? 'active' : ''}`} onClick={() => setTab('routine')}>
+              <span className="nav-icon">📋</span>
+              <span className="nav-label">روتین</span>
+            </button>
+            <button className={`nav-item ${tab === 'stats' ? 'active' : ''}`} onClick={() => setTab('stats')}>
+              <span className="nav-icon">📊</span>
+              <span className="nav-label">آمار</span>
+            </button>
+            <button className={`nav-item ${tab === 'finance' ? 'active' : ''}`} onClick={() => setTab('finance')}>
+              <span className="nav-icon">💰</span>
+              <span className="nav-label">مالی</span>
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // Render
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      const sw = `
+        self.addEventListener('install', (e) => e.waitUntil(self.skipWaiting()));
+        self.addEventListener('activate', (e) => e.waitUntil(self.clients.claimClients()));
+        self.addEventListener('fetch', (e) => {
+          if (e.request.method === 'GET') {
+            e.respondWith(
+              fetch(e.request).catch(() => {
+                return new Response('Offline', { status: 503 });
+              })
+            );
+          }
+        });
+      `;
+      const blob = new Blob([sw], { type: 'application/javascript' });
+      const url = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(url).catch(() => {});
+    }
+  </script>
+</body>
+</html>
